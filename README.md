@@ -65,9 +65,45 @@ As earlier layers bearing smaller receptive field can represent smaller sized ob
 
 Because of this, SSD allows us to define a **hierarchy of grid cells** at different layers. For example, we could use a 4x4 grid to find smaller objects, a 2x2 grid to find mid sized objects and a 1x1 grid to find objects that cover the entire image.
 
+## RetinaNet
+### How RetinaNet works?
+
+RetinaNet is one of the best one-stage object detection models that has proven to work well with dense and small scale objects. For this reason, it has become a popular object detection model to be used with aerial and satellite imagery.
+
+![image](https://user-images.githubusercontent.com/77944932/166631400-a9c5b156-3b71-47d3-b9cb-cea4f90ca6ee.png)
+
+Swimming Pools detection using RetinaNet
+
+RetinaNet has been formed by making two improvements over existing single stage object detection models - Feature Pyramid Networks (FPN) and Focal Loss. 
 
 
+### What's a Feature Pyramid Network?
 
+Traditionally, in computer vision, featurized image pyramids have been used to detect objects with varying scales in an image. Featurized image pyramids are feature pyramids built upon image pyramids. This means one would take an image and subsample it into lower resolution and smaller size images (thus, forming a pyramid). Hand-engineered features are then extracted from each layer in the pyramid to detect the objects. This makes the pyramid scale-invariant. But, this process is compute and memory intensive. 
+
+With the advent of deep learning, these hand-engineered features were replaced by CNNs. Later, the pyramid itself was derived from the inherent pyramidal hierarchical structure of the CNNs. In a CNN architecture, the output size of feature maps decreases after each successive block of convolutional operations, and forms a pyramidal structure.
+
+![image](https://user-images.githubusercontent.com/77944932/166631551-a8d1a700-4d85-4860-9e71-b7d006b23744.png)
+
+Different types of pyramid architectures.
+
+There have been various architectures that utilize the pyramid structure (Figure 2). The (a) Featurized image pyramid, as we have discussed, is compute intensive. (b) Single (scale) feature maps have been used for faster detections. Even though they are robust and fast, pyramids are still needed to get the most accurate results [1]. (c) Pyramidal feature hierarchy has been utilized by models such as Single Shot detector, but it doesn't reuse the multi-scale feature maps from different layers. (d) Feature Pyramid Network (FPN) makes up for the shortcomings in these variations. FPN creates an architecture with rich semantics at all levels as it combines low-resolution semantically strong features with high-resolution semantically weak features [1]. This is achieved by creating a top-down pathway with lateral connections to bottom-up convolutional layers.
+
+Top-down pathway, bottom-up pathway and lateral connections will be better understood in the next section when we take a look at the RetinaNet architecture. RetinaNet incorporates FPN and adds classification and regression subnetworks to create an object detection model.
+
+RetinaNet architecture
+There are four major components of a RetinaNet model architecture (Figure 3):
+
+a) Bottom-up Pathway - The backbone network (e.g. ResNet) which calculates the feature maps at different scales, irrespective of the input image size or the backbone.
+b) Top-down pathway and Lateral connections - The top down pathway upsamples the spatially coarser feature maps from higher pyramid levels, and the lateral connections merge the top-down layers and the bottom-up layers with the same spatial size.
+c) Classification subnetwork - It predicts the probability of an object being present at each spatial location for each anchor box and object class.
+d) Regression subnetwork - It's regresses the offset for the bounding boxes from the anchor boxes for each ground-truth object.
+
+![image](https://user-images.githubusercontent.com/77944932/166631641-8191b87f-5d9c-44cd-af18-efafd9e7739c.png)
+
+### Focal Loss
+
+Focal Loss (FL) is an enhancement over Cross-Entropy Loss (CE) and is introduced to handle the class imbalance problem with single-stage object detection models. Single Stage models suffer from a extreme foreground-background class imbalance problem due to dense sampling of anchor boxes (possible object locations) [2]. In RetinaNet, at each pyramid layer there can be thousands of anchor boxes. Only a few will be assigned to a ground-truth object while the vast majority will be background class. These easy examples (detections with high probabilities) although resulting in small loss values can collectively overwhelm the model. Focal Loss reduces the loss contribution from easy examples and increases the importance of correcting missclassified examples.
 
 
 
